@@ -1,0 +1,20 @@
+May 13, 2020
+13/05/2020 17:45:42
+====================================
+Select Folder: D:\Capstone\CODE
+Name File: Name Your File
+File Type: AVI
+FPS: 25
+Exposure Time (us): 100000000
+No. of Frames: 250
+Gain: 0
+Camera Width: 1440
+Camera Height: 1080
+Rotate 0.0
+Select File(s): Folder / file anme
+Height of ROI: 110
+Channels: 35
+Blur Value (3,5 or 7): 3
+Delay (ms): 1
+No of frame skip: 10
+====================================
