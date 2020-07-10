@@ -1,12 +1,12 @@
 from PyQt5.QtWidgets import *
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QPixmap
-# from PyQt5.QtCore.Qt import KeepAspectRatio, FastTransformation
 
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.count = 0
         self.green = QPixmap('green tick.png').scaled(32, 32, QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
         self.grey = QPixmap('grey tick.png').scaled(32, 32, QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
         self.white = QPixmap('white tick.png').scaled(32, 32, QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
@@ -65,38 +65,85 @@ class MainWindow(QMainWindow):
         self.staff_id = QtWidgets.QLineEdit(self.centralwidget)
         self.staff_id.setGeometry(QtCore.QRect(160, 30, 200, 45))
         self.staff_id.setStyleSheet("border: 0px solid blue")
-        self.staff_id.setText("Technician Kerwin")
+
         
         self.patient_id = QtWidgets.QLineEdit(self.centralwidget)
         self.patient_id.setGeometry(QtCore.QRect(760, 30, 200, 45))
         self.patient_id.setStyleSheet("border: 0px solid blue")
-        self.patient_id.setText("G89843883M")
+
         
         self.loading_label = QtWidgets.QLabel(self.centralwidget)        
-        self.loading_label.setGeometry(QtCore.QRect(326, 80, 430, 430))
-        self.loading = QPixmap('red bar.png')
-        self.loading_label.setPixmap(self.loading)   
+        self.loading_label.setGeometry(QtCore.QRect(326, 80, 430, 430))   
                 
         # Buttons
         self.cancel_btn = QtWidgets.QPushButton(self.centralwidget)
         self.cancel_btn.setGeometry(QtCore.QRect(30, 500, 190, 60))
         self.cancel_btn.setStyleSheet("background-color: rgba(0, 255, 255, 0);") 
-        self.cancel_btn.clicked.connect(self.step2)
+        self.cancel_btn.clicked.connect(QApplication.instance().quit)
         
         self.start_btn = QtWidgets.QPushButton(self.centralwidget)
         self.start_btn.setGeometry(QtCore.QRect(740, 500, 220, 65))
         self.start_btn.setStyleSheet("background-color: rgba(0, 255, 255, 0);")   
         self.start_btn.clicked.connect(self.step3)
                
+            
+        self.scan_label = QtWidgets.QLabel(self.centralwidget)
+        self.scan_label.setGeometry(QtCore.QRect(440, 330, 200,100))        
+        self.sacn_image = QPixmap('RIFD Sign.png').scaled(150, 90, QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
+        self.scan_label.setPixmap(self.sacn_image)     
+        
         self.main_btn = QtWidgets.QPushButton(self.centralwidget)
         self.main_btn.setGeometry(QtCore.QRect(378, 170, 260, 260))
+        self.main_btn.setText("Tap Staff ID \n to Login")
+        self.main_btn.setStyleSheet("QPushButton{font-size: 28px;font-family: Arial;color: rgb(255, 255, 255);background-color: rgba(0, 255, 255, 0);}")        
+        self.main_btn.clicked.connect(self.button_function)
+            
+    
+    def button_function(self):
+        if self.count == 0:            
+            self.barcode()
+            self.count +=1
+        elif self.count == 1:            
+            self.step1()
+            self.count +=1
+        elif self.count == 2:
+            self.step2()
+            self.count +=1
+        elif self.count == 3:
+            self.step3()
+            self.count +=1
+        elif self.count == 4:
+            self.step4()
+            self.count +=1
+        elif self.count == 5:
+            self.step5()
+            self.count +=1
+        elif self.count == 6:
+            self.step6()
+            self.count +=1
+        elif self.count == 7:
+            self.step7()
+            self.count +=1
+        elif self.count == 8:
+            self.step8()
+            self.count +=1
+            
+        
+        
+    def barcode(self):
+        self.main_btn.setText("Scan Patient \n Barcode")
+        self.staff_id.setText("Technician Kerwin") 
+        self.barcode_image = QPixmap('barcode.png').scaled(150, 90, QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
+        self.scan_label.setPixmap(self.barcode_image) 
+        
+        
+    def step1(self):
+        self.patient_id.setText("G89843883M")
         self.main_btn.setText("Prepare and \n Insert Test Chip")
-        self.main_btn.setStyleSheet("QPushButton{font-size: 28px;font-family: Arial;color: rgb(255, 255, 255);background-color: rgba(0, 255, 255, 0);}")
-        
-        self.main_btn.clicked.connect(self.step8)
-        
-        
-        
+        self.loading = QPixmap('red bar.png')
+        self.loading_label.setPixmap(self.loading)    
+        self.scan_label.clear()
+
 
     def step2(self):
         self.start_btn.setStyleSheet("background-color: rgba(0, 255, 255, 0);background-image: url('Start button.png');")
@@ -106,6 +153,7 @@ class MainWindow(QMainWindow):
 
 
     def step3(self):
+        self.count = 4
         self.start_btn.setStyleSheet("background-color: rgba(0, 255, 255, 0);")   
         self.formLayoutWidget.show()
         self.formLayoutWidget_2.show()
@@ -119,7 +167,7 @@ class MainWindow(QMainWindow):
         self.label_6.setPixmap(self.grey)    
         
     def step4(self):
-        self.label_1.setStyleSheet("font: 75 11pt \"MS Shell Dlg 2\";color: grey;")
+        self.label.setStyleSheet("font: 75 11pt \"MS Shell Dlg 2\";color: grey;")
         self.label_2.setStyleSheet("font: 75 11pt \"MS Shell Dlg 2\";color: black;")
         self.label_6.setPixmap(self.green)   
         self.label_7.setPixmap(self.grey)  
