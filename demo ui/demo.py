@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import *
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QPixmap
+from autofocus import autofocus
 
 
 class MainWindow(QMainWindow):
@@ -102,31 +103,23 @@ class MainWindow(QMainWindow):
     def button_function(self):
         if self.count == 0:            
             self.barcode()
-            self.count +=1
         elif self.count == 1:            
             self.step1()
-            self.count +=1
         elif self.count == 2:
             self.step2()
-            self.count +=1
         elif self.count == 3:
             self.step3()
-            self.count +=1
         elif self.count == 4:
             self.step4()
-            self.count +=1
         elif self.count == 5:
             self.step5()
-            self.count +=1
         elif self.count == 6:
             self.step6()
-            self.count +=1
         elif self.count == 7:
             self.step7()
-            self.count +=1
         elif self.count == 8:
             self.step8()
-            self.count +=1
+        self.count +=1
             
         
         
@@ -143,6 +136,13 @@ class MainWindow(QMainWindow):
         self.loading = QPixmap('red bar.png')
         self.loading_label.setPixmap(self.loading)    
         self.scan_label.clear()
+        
+#         os.system('python autofocus.py')
+        while autofocus():
+            self.main_btn.setText("Auto focusing")
+        
+        self.count = 2
+        self.step2()
 
 
     def step2(self):
