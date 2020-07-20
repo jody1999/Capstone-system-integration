@@ -4,7 +4,8 @@ from PyQt5.QtGui import QPixmap
 from autofocus import autofocus
 from gpio_test import card_tap
 from generate_features import generate_features
-from data_storage import store_data
+#from data_storage import store_data
+from getpass import getpass
 
 
 class MainWindow(QMainWindow):
@@ -95,9 +96,14 @@ class MainWindow(QMainWindow):
         
 #     card tap and read user id 
         self.staff_id_str = card_tap()       
-#     check if the read user id is valid?? 
+        self.staff_id.setText(str(self.staff_id_str))
+        
+        self.count = 1
+        self.main_btn.setText("Scan Patient \n Barcode")
+        self.barcode_image = QPixmap('barcode.png').scaled(150, 90, QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
+        self.scan_label.setPixmap(self.barcode_image)
 
-        self.staff_id.setText(self.staff_id_str)
+
         self.barcode()    
             
 #     for mannual working flow 
@@ -110,8 +116,8 @@ class MainWindow(QMainWindow):
             self.step2()
         elif self.count == 3:
             self.step3()
-#         elif self.count == 4:
-#             self.step4()
+        elif self.count == 4:
+            self.step4()
         elif self.count == 5:
             self.step5()
         elif self.count == 6:
@@ -131,22 +137,9 @@ class MainWindow(QMainWindow):
         self.scan_label.setPixmap(self.barcode_image)         
         
 #         read the barcode info
-        self.patient_id_str = 'xx'
-
-#         set the lineEdit with barcode patient id 
-        self.patient_id.setText(patient_id_str)
-
-
-'''
-step1: prepare {red bar}
-step2: prepare finish {green bar; start button}
-step3: prepare progress {loading; check list; 0 green, 1 grey, 4 white circles}
-step4: priming progress {loading; check list; 1 green, 1 grey, 3 white circles}
-step5: test progress {loading; check list; 2 green, 1 grey, 2 white circles}
-step6: data conversion progress {loading; check list; 3 green, 1 grey, 1 white circles}
-step7: data analytics progress {loading; check list; 4 green, 1 grey, 0 white circles}
-step8: showing result {green bar}
-'''
+        self.patient_id_str = str(getpass(prompt=""))
+        self.patient_id.setText(self.patient_id_str)
+        self.step1()
 
     def step1(self):  # pressure clamp,switch init; optics home
         self.count = 2
@@ -162,7 +155,7 @@ step8: showing result {green bar}
     
     
 
-        self.start_bptn.setStyleSheet("background-color: rgba(0, 255, 255, 0);background-image: url('Start button.png');")
+        self.start_btn.setStyleSheet("background-color: rgba(0, 255, 255, 0);background-image: url('Start button.png');")
         self.loading = QPixmap('green bar.png')
         self.loading_label.setPixmap(self.loading)  
         self.main_btn.setText("Press Start \n to Begin the Test")
@@ -237,6 +230,19 @@ step8: showing result {green bar}
         self.loading = QPixmap('green bar.png')
         self.loading_label.setPixmap(self.loading)  
         self.main_btn.setText("Result: ")
+
+
+'''
+step1: prepare {red bar}
+step2: prepare finish {green bar; start button}
+step3: prepare progress {loading; check list; 0 green, 1 grey, 4 white circles}
+step4: priming progress {loading; check list; 1 green, 1 grey, 3 white circles}
+step5: test progress {loading; check list; 2 green, 1 grey, 2 white circles}
+step6: data conversion progress {loading; check list; 3 green, 1 grey, 1 white circles}
+step7: data analytics progress {loading; check list; 4 green, 1 grey, 0 white circles}
+step8: showing result {green bar}
+'''
+
 
 stylesheet = """
     MainWindow {
