@@ -6,12 +6,13 @@ from gpio_test import card_tap
 from generate_features import generate_features
 #from data_storage import store_data
 from getpass import getpass
+from classification import classification
 
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.count = 0
+        self.count = -1
         self.green = QPixmap('green tick.png').scaled(32, 32, QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
         self.grey = QPixmap('grey tick.png').scaled(32, 32, QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
         self.white = QPixmap('white tick.png').scaled(32, 32, QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
@@ -94,20 +95,22 @@ class MainWindow(QMainWindow):
         self.main_btn.setStyleSheet("QPushButton{font-size: 28px;font-family: Arial;color: rgb(255, 255, 255);background-color: rgba(0, 255, 255, 0);}")        
         self.main_btn.clicked.connect(self.button_function)
         
-#     card tap and read user id 
+    def rfid():    # card tap and read user id 
         self.staff_id_str = card_tap()       
         self.staff_id.setText(str(self.staff_id_str))
         
-        self.count = 1
+        self.count = 0
         self.main_btn.setText("Scan Patient \n Barcode")
         self.barcode_image = QPixmap('barcode.png').scaled(150, 90, QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
         self.scan_label.setPixmap(self.barcode_image)
-
-
+        
         self.barcode()    
+        
             
 #     for mannual working flow 
     def button_function(self):
+        if self.count == -1:
+            self.rfid()
         if self.count == 0:            
             self.barcode()
         elif self.count == 1:            
@@ -130,12 +133,8 @@ class MainWindow(QMainWindow):
             
         
         
-    def barcode(self):
-        self.count = 1
-        self.main_btn.setText("Scan Patient \n Barcode")
-        self.barcode_image = QPixmap('barcode.png').scaled(150, 90, QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
-        self.scan_label.setPixmap(self.barcode_image)         
-        
+    def barcode(self):            
+        self,count = 1
 #         read the barcode info
         self.patient_id_str = str(getpass(prompt=""))
         self.patient_id.setText(self.patient_id_str)
@@ -213,13 +212,14 @@ class MainWindow(QMainWindow):
         self.label_10.setPixmap(self.grey)    
         self.main_btn.setText("Data Analysis \n in Progress")
         
-        # get feature from raw csv
+        # get feature from raw csv # then classify
         generate_features()
-        # then classify
+        self.result = (classification() == 1)
         
         # store the data
-        data_entries = (self.patient_id_str, self.patient_nric, self.staff_id_str, self.time, self.classification, self.WBC_count, self.RBC_count, self.raw_video_id)
-        store_data(data_entries)
+#         data_entries = (self.patient_id_str, self.patient_nric, self.staff_id_str, self.time, self.classification, self.WBC_count, self.RBC_count, self.raw_video_id)
+#         store_data(data_entries)
+        self.step8()
         
         
     def step8(self): #show result, pressure adn optics go home
@@ -228,8 +228,11 @@ class MainWindow(QMainWindow):
         
         self.loading_label.setGeometry(QtCore.QRect(326, 80, 430, 430))
         self.loading = QPixmap('green bar.png')
-        self.loading_label.setPixmap(self.loading)  
-        self.main_btn.setText("Result: ")
+        self.loading_label.setPixmap(self.loading) 
+        if self.result:  # classification == 1 
+            self.main_btn.setText("Result: Positive")
+        else:
+            self.main_btn.setText("Result: Negative")
 
 
 '''

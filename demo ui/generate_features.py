@@ -334,15 +334,15 @@ def further_features(raw_path, feature_df):
     return feature_df
 
 def generate_features():
-    WBC_Raw = pd.read_csv('\data\Raw.csv')
-    RBC_Raw = pd.read_csv('\data\RBC_Raw.csv')
-    count_para = pd.read_csv('\data\Count.csv')
+    WBC_Raw = pd.read_csv(r'D:\Capstone\CODE\Capstone-system-integration\demo ui\data\Raw.csv')
+    RBC_Raw = pd.read_csv(r'D:\Capstone\CODE\Capstone-system-integration\demo ui\data\RBC_Raw.csv')
+    count_para = pd.read_csv(r'D:\Capstone\CODE\Capstone-system-integration\demo ui\data\Count.csv')
 
     feature_df = Basic_Features(WBC_Raw,count_para,RBC_Raw)
     print("====== First level features generation finished. ======")
-    raw_path = '\data\Raw.csv'
+    raw_path = r'D:\Capstone\CODE\Capstone-system-integration\demo ui\data\Raw.csv'
     feature_df = further_features(raw_path, feature_df)
-    feature_df.to_csv('\data\Feature.csv')
+    feature_df.to_csv(r'D:\Capstone\CODE\Capstone-system-integration\demo ui\data\Feature.csv')
     print("====== Second level features generation finished. ======")
 
 

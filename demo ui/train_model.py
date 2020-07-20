@@ -7,7 +7,7 @@ from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.metrics import classification_report, roc_auc_score
-
+from joblib import dump, load
 
 def extract_data(filename: str):
     df: pandas.DataFrame = pandas.read_csv(filename)
@@ -15,6 +15,9 @@ def extract_data(filename: str):
 
     selected_features = df[columns].to_numpy()
     labels = df["Patient"].to_numpy()
+    labels = np.where(labels >= 0, labels, 0)
+    labels = np.where(labels <= 1, labels, 1)
+    
     reshaped_cell_data = selected_features.transpose()
     processed_data = np.zeros_like(selected_features)
     row_size = reshaped_cell_data.shape[1]
@@ -54,9 +57,7 @@ def train(x_data: np.ndarray, y_data: np.ndarray, gamma_values):
         sv_classifier = SVC()
         gridsearch_svm = GridSearchCV(sv_classifier, parameters)
         gridsearch_svm.fit(X_train, y_train)
-        # prediction = sv_classifier.predict(X_test)
         best_c = gridsearch_svm.best_estimator_.C
-        # best_metrics.append((results, gamma))
 
         sv_classifier_test = SVC(C=best_c, gamma=gamma)
         sv_classifier_test.fit(X_train, y_train)
@@ -66,14 +67,14 @@ def train(x_data: np.ndarray, y_data: np.ndarray, gamma_values):
         roc_score = roc_auc_score(y_test, prediction)
         metrics.append([accuracy, val_spe, val_sens, roc_score])
 
-        # model_list.append(sv_classifier)
+        dump(sv_classifier_test, 'model.joblib') 
 
 
     return metrics
 
-# print(np.mean(metrics, axis=0))
-gamma_values = extract_gamma("\data\250 Gamma data.csv")
-processed_data, labels = extract_data("\data\Feature.csv")
+gamma_values = extract_gamma(r"D:\Capstone\CODE\Capstone-system-integration\demo ui\data\250 Gamma data.csv")
+# processed_data, labels = extract_data(r"D:\Capstone\CODE\Capstone-system-integration\demo ui\data\Feature.csv")
+processed_data, labels = extract_data(r"D:\Capstone\CODE\Capstone-system-integration\demo ui\data\Processed Data.csv")
 metrics = train(processed_data, labels, gamma_values)
 print(np.mean(metrics, axis=0))
 

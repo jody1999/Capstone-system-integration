@@ -12,7 +12,6 @@ WBC_Raw = pd.read_csv('Raw.csv')
 RBC_Raw = pd.read_csv('RBC_Raw.csv')
 count_para = pd.read_csv('Count.csv')
 
-
 def WBC_Total(data_WBC):
     InvL35_cols = data_WBC.iloc[:,2:37]
     InvL350_cols = data_WBC.iloc[:,37:72]
