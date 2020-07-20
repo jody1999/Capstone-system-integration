@@ -6,12 +6,12 @@ from gpio_test import card_tap
 from generate_features import generate_features
 #from data_storage import store_data
 from getpass import getpass
-
+#from barcode import scan_barcode
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.count = 0
+        self.count = -1
         self.green = QPixmap('green tick.png').scaled(32, 32, QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
         self.grey = QPixmap('grey tick.png').scaled(32, 32, QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
         self.white = QPixmap('white tick.png').scaled(32, 32, QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
@@ -78,11 +78,11 @@ class MainWindow(QMainWindow):
         # Buttons
         self.cancel_btn = QtWidgets.QPushButton(self.centralwidget)
         self.cancel_btn.setGeometry(QtCore.QRect(30, 500, 190, 60))
-        self.cancel_btn.setStyleSheet("background-color: rgba(0, 255, 255, 0);") 
+        self.cancel_btn.setStyleSheet("background-color: rgba(0, 255, 255, 0);border:0px") 
         self.cancel_btn.clicked.connect(QApplication.instance().quit)        
         self.start_btn = QtWidgets.QPushButton(self.centralwidget)
         self.start_btn.setGeometry(QtCore.QRect(740, 500, 220, 65))
-        self.start_btn.setStyleSheet("background-color: rgba(0, 255, 255, 0);")   
+        self.start_btn.setStyleSheet("background-color: rgba(0, 255, 255, 0);border:0px;")  
         self.start_btn.clicked.connect(self.step3)
         self.scan_label = QtWidgets.QLabel(self.centralwidget)
         self.scan_label.setGeometry(QtCore.QRect(440, 330, 200,100))        
@@ -90,30 +90,29 @@ class MainWindow(QMainWindow):
         self.scan_label.setPixmap(self.sacn_image)             
         self.main_btn = QtWidgets.QPushButton(self.centralwidget)
         self.main_btn.setGeometry(QtCore.QRect(378, 170, 260, 260))
-        self.main_btn.setText("Tap Staff ID \n to Login")
-        self.main_btn.setStyleSheet("QPushButton{font-size: 28px;font-family: Arial;color: rgb(255, 255, 255);background-color: rgba(0, 255, 255, 0);}")        
+        self.main_btn.setText("Press and tap \n Staff ID to login")
+        self.main_btn.setStyleSheet("QPushButton{font-size: 28px;font-family: Arial;color: rgb(255, 255, 255);background-color: rgba(0, 255, 255, 0); border: 0px}")        
         self.main_btn.clicked.connect(self.button_function)
         
+
+    def rfid(self):
 #     card tap and read user id 
-        self.staff_id_str = card_tap()       
+        #self.main_btn.setText("Tap Staff ID \n to Login")
+        self.staff_id_str = card_tap() 
         self.staff_id.setText(str(self.staff_id_str))
         
-        self.count = 1
-        self.main_btn.setText("Scan Patient \n Barcode")
+        self.count = 0
+        self.main_btn.setText("Press after Scan \n Patient Barcode")
         self.barcode_image = QPixmap('barcode.png').scaled(150, 90, QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
         self.scan_label.setPixmap(self.barcode_image)
-
-
-        self.barcode()    
+    
             
 #     for mannual working flow 
     def button_function(self):
-        if self.count == 0:            
-            self.barcode()
-        elif self.count == 1:            
+        if self.count == -1:
+            self.rfid()
+        elif self.count == 1:
             self.step1()
-        elif self.count == 2:
-            self.step2()
         elif self.count == 3:
             self.step3()
         elif self.count == 4:
@@ -129,17 +128,7 @@ class MainWindow(QMainWindow):
         self.count +=1
             
         
-        
-    def barcode(self):
-        self.count = 1
-        self.main_btn.setText("Scan Patient \n Barcode")
-        self.barcode_image = QPixmap('barcode.png').scaled(150, 90, QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
-        self.scan_label.setPixmap(self.barcode_image)         
-        
-#         read the barcode info
-        self.patient_id_str = str(getpass(prompt=""))
-        self.patient_id.setText(self.patient_id_str)
-        self.step1()
+   
 
     def step1(self):  # pressure clamp,switch init; optics home
         self.count = 2
@@ -257,6 +246,7 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setStyleSheet(stylesheet)     
     window = MainWindow()
+    window.showFullScreen()
     window.resize(1024, 600)
     window.show()
     sys.exit(app.exec_())
