@@ -5,8 +5,8 @@ from joblib import dump, load
 import os
 
 cwd = os.getcwd()
-filename = os.path.join(cwd, "/data/single_sample_Feature" + "." + "csv")
-model_path = os.path.join(cwd, "/data/model" + "." + "joblib")
+filename = os.path.join(cwd, "data/single_sample_Feature" + "." + "csv")
+model_path = os.path.join(cwd, "model" + "." + "joblib")
 
 def classification():
     df: pandas.DataFrame = pandas.read_csv(filename)
@@ -16,8 +16,9 @@ def classification():
 
 #    load the model from pickles
     sv_classifier = SVC()
-    sv_classifier = load(model_path) 
+    sv_classifier = load(model_path)
+#    print(X_test)
     prediction = sv_classifier.predict(X_test)
     print(prediction.tolist()[0])
     return prediction.tolist()[0]
-# classfication()
+#classification()

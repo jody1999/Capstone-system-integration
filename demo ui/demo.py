@@ -170,7 +170,7 @@ class MainWindow(QMainWindow):
 
     def step3(self): # check chip inserted, autofocusing
         self.count = 4
-        self.start_btn.setStyleSheet("background-color: rgba(0, 255, 255, 0);")   
+        self.start_btn.setStyleSheet("background-color: rgba(0, 255, 255, 0);border :0px")   
         self.formLayoutWidget.show()
         self.formLayoutWidget_2.show()
         self.main_btn.setText("Preparation \n in Progress")
@@ -222,11 +222,12 @@ class MainWindow(QMainWindow):
         # get feature from raw csv # then classify
         generate_features()
         self.result = (classification() == 1)
-        
+        print(self.result)
+ 
         # store the data
 #         data_entries = (self.patient_id_str, self.patient_nric, self.staff_id_str, self.time, self.classification, self.WBC_count, self.RBC_count, self.raw_video_id)
 #         store_data(data_entries)
-        self.step8()
+       # self.step8()
         
         
     def step8(self): #show result, pressure adn optics go home

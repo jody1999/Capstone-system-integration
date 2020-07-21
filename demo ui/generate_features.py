@@ -260,9 +260,11 @@ def kl_divergence(p, q):
     """Kullback-Leibler divergence D(P || Q) for discrete distributions
     Parameters: [p, q] : array-like, dtype=float, shape=n, Discrete probability distributions.
     """
-    p = np.asarray(p, dtype=np.float)+ 0.001 
-    q = np.asarray(q, dtype=np.float)+ 0.001
-    return np.sum(np.where(p != 0,  p * np.log(p / q), 0))    
+    p = np.asarray(p, dtype=np.float) 
+    q = np.asarray(q, dtype=np.float)
+    p[p<=0] = 0.001
+    q[q<=0] = 0.001    
+    return np.sum(np.where(p > 0,  p * np.log(p / q), 0))    
 
 def get_mean_index(data):
     mean = 0
@@ -351,6 +353,5 @@ def generate_features():
    
 
 
-
-
+#generate_features()
 
