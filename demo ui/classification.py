@@ -5,8 +5,8 @@ from joblib import dump, load
 import os
 
 cwd = os.getcwd()
-filename = os.path.join(cwd, "single_sample_Feature" + "." + "csv")
-model_path = os.path.join(cwd, "model" + "." + "joblib")
+filename = os.path.join(cwd, "/data/single_sample_Feature" + "." + "csv")
+model_path = os.path.join(cwd, "/data/model" + "." + "joblib")
 
 def classfication():
     df: pandas.DataFrame = pandas.read_csv(filename)
