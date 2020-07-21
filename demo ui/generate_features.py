@@ -226,7 +226,6 @@ def Basic_Features(data_WBC,data_CountPara,data_RBC):
     MeanSize['MeanSize_L'] = 0.5*Size['Size_L35'] + 0.5*Size['Size_L350']
     
     Df = pd.concat([Sample,Patient,W_Mean,Size,MeanSize,SD,Skew,Kurt,Count],axis=1)
-    
     return Df
 
 
@@ -316,7 +315,6 @@ def further_features(raw_path, feature_df):
                    'R2_invL35','R2_invL350','R2_L35', 'R2_L350']
 
     ############################3
-    # feature_df = pd.read_csv('Feature.csv',encoding = "ISO-8859-1",header=[0], skiprows=0, index_col=0)
 
     for s in new_feature:
         feature_df.insert(loc = 1, column = s, value = df[s].values)
@@ -336,10 +334,12 @@ def further_features(raw_path, feature_df):
 
 def generate_features():
     cwd = os.getcwd()    
-    wbc_path = os.path.join(cwd, "/data/single_sample_Raw" + "." + "csv")
     rbc_path = os.path.join(cwd, "/data/single_sample_RBC_Raw" + "." + "csv")
-    count_path = os.path.join(cwd, "/data/Count" + "." + "csv")
     feature_path = os.path.join(cwd, "/data/single_sample_Feature" + "." + "csv")
+    wbc_path = os.path.join(cwd, "data/single_sample_Raw" + "." + "csv")
+    rbc_path = os.path.join(cwd, "data/single_sample_RBC_Raw" + "." + "csv")
+    count_path = os.path.join(cwd, "data/single_sample_Count" + "." + "csv")
+    feature_path = os.path.join(cwd, "data/single_sample_Feature" + "." + "csv")
     
     WBC_Raw = pd.read_csv(wbc_path)
     RBC_Raw = pd.read_csv(rbc_path)
@@ -347,12 +347,10 @@ def generate_features():
 
     feature_df = Basic_Features(WBC_Raw,count_para,RBC_Raw)
     print("====== First level features generation finished. ======")
-    
     feature_df = further_features(wbc_path, feature_df)
     feature_df.to_csv(feature_path)
     print("====== Second level features generation finished. ======")
-
-
+   
 
 
 
