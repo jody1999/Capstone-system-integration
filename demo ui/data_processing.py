@@ -46,7 +46,7 @@ def metric_generation(predicted: list, gold: np.ndarray):
     true_positive = np.sum((gold == 1))
     return true_positive/(true_positive + false_negative), true_negative/(true_negative + false_negative), accuracy
 
-def train(x_data: np.ndarray, y_data: np.ndarray, gamma_values):
+def train(x_data: np.ndarray, y_data: np.ndarray, gamma_values, path):
     model_list = []
     metrics = []
     best_metrics = []
@@ -68,7 +68,7 @@ def train(x_data: np.ndarray, y_data: np.ndarray, gamma_values):
         roc_score = roc_auc_score(y_test, prediction)
         metrics.append([accuracy, val_spe, val_sens, roc_score])
 
-        dump(sv_classifier_test, 'model.joblib') 
+        dump(sv_classifier_test, model_path) 
 
 
     return metrics
@@ -76,9 +76,10 @@ def train(x_data: np.ndarray, y_data: np.ndarray, gamma_values):
 cwd = os.getcwd()    
 gamma_path = os.path.join(cwd, "\data\250 Gamma data" + "." + "csv")
 processed_path = os.path.join(cwd, "\data\Processed Data" + "." + "csv")
+model_path = os.path.join(cwd, "\data\model" + "." + "joblib")
     
 gamma_values = extract_gamma(gamma_path)
 processed_data, labels = extract_data(processed_path)
-metrics = train(processed_data, labels, gamma_values)
-print(np.mean(metrics, axis=0))
+metrics = train(processed_data, labels, gamma_values, model_path)
+# print(np.mean(metrics, axis=0))
 
