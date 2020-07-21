@@ -5,8 +5,23 @@ from autofocus import autofocus
 from gpio_test import card_tap
 from generate_features import generate_features
 #from data_storage import store_data
+import traceback
 from classification import classification
+from PyQt5.QtCore import *
 
+class Worker(QRunnable):
+    def __init__(self, fn, *args, **kwargs):
+        super(Worker, self).__init__()
+        self.fn = fn
+        self.args = args
+        self.kwargs = kwargs
+    @pyqtSlot()
+    def run(self):
+        try:
+            result = self.fn(*self.args, **self.kwargs)
+        except:
+            traceback.print_exec()
+    
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -93,7 +108,11 @@ class MainWindow(QMainWindow):
         self.main_btn.setText("Press and tap \n Staff ID to login")
         self.main_btn.setStyleSheet("QPushButton{font-size: 28px;font-family: Arial;color: rgb(255, 255, 255);background-color: rgba(0, 255, 255, 0); border: 0px}")        
         self.main_btn.clicked.connect(self.button_function)
+        self.threadpool = QThreadPool()
         
+    def thread_execute(self):
+        worker = Worker(self.rfid)
+        self.threadpool.start(worker)
 
 
     def rfid(self):
