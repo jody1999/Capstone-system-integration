@@ -334,8 +334,6 @@ def further_features(raw_path, feature_df):
 
 def generate_features():
     cwd = os.getcwd()    
-    rbc_path = os.path.join(cwd, "/data/single_sample_RBC_Raw" + "." + "csv")
-    feature_path = os.path.join(cwd, "/data/single_sample_Feature" + "." + "csv")
     wbc_path = os.path.join(cwd, "data/single_sample_Raw" + "." + "csv")
     rbc_path = os.path.join(cwd, "data/single_sample_RBC_Raw" + "." + "csv")
     count_path = os.path.join(cwd, "data/single_sample_Count" + "." + "csv")
