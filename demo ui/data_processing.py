@@ -75,7 +75,7 @@ def train(x_data: np.ndarray, y_data: np.ndarray, gamma_values, path):
 
 cwd = os.getcwd()    
 gamma_path = os.path.join(cwd, "\data\250 Gamma data" + "." + "csv")
-processed_path = os.path.join(cwd, "\data\Processed Data" + "." + "csv")
+processed_path = os.path.join(cwd, "\data\Feature" + "." + "csv")
 model_path = os.path.join(cwd, "\data\model" + "." + "joblib")
     
 gamma_values = extract_gamma(gamma_path)

@@ -5,7 +5,7 @@ from joblib import dump, load
 import os
 
 cwd = os.getcwd()
-filename = os.path.join(cwd, "single_sample_feature" + "." + "csv")
+filename = os.path.join(cwd, "single_sample_Feature" + "." + "csv")
 model_path = os.path.join(cwd, "model" + "." + "joblib")
 
 def classfication():
