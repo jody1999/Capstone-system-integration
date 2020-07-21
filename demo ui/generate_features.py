@@ -7,6 +7,7 @@ from scipy import stats
 from scipy import optimize
 import scipy.stats
 from sklearn.metrics import r2_score
+import os
 
 def WBC_Total(data_WBC):
     InvL35_cols = data_WBC.iloc[:,2:37]
@@ -334,15 +335,21 @@ def further_features(raw_path, feature_df):
     return feature_df
 
 def generate_features():
-    WBC_Raw = pd.read_csv(r'D:\Capstone\CODE\Capstone-system-integration\demo ui\data\Raw.csv')
-    RBC_Raw = pd.read_csv(r'D:\Capstone\CODE\Capstone-system-integration\demo ui\data\RBC_Raw.csv')
-    count_para = pd.read_csv(r'D:\Capstone\CODE\Capstone-system-integration\demo ui\data\Count.csv')
+    cwd = os.getcwd()    
+    wbc_path = os.path.join(cwd, "\data\Raw" + "." + "csv")
+    rbc_path = os.path.join(cwd, "\data\RBC_Raw" + "." + "csv")
+    count_path = os.path.join(cwd, "\data\Count" + "." + "csv")
+    feature_path = os.path.join(cwd, "\data\Feature" + "." + "csv")
+    
+    WBC_Raw = pd.read_csv(wbc_path)
+    RBC_Raw = pd.read_csv(rbc_path)
+    count_para = pd.read_csv(count_path)
 
     feature_df = Basic_Features(WBC_Raw,count_para,RBC_Raw)
     print("====== First level features generation finished. ======")
-    raw_path = r'D:\Capstone\CODE\Capstone-system-integration\demo ui\data\Raw.csv'
-    feature_df = further_features(raw_path, feature_df)
-    feature_df.to_csv(r'D:\Capstone\CODE\Capstone-system-integration\demo ui\data\Feature.csv')
+    
+    feature_df = further_features(wbc_path, feature_df)
+    feature_df.to_csv(feature_path)
     print("====== Second level features generation finished. ======")
 
 

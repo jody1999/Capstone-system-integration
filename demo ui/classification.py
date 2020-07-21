@@ -2,8 +2,11 @@ import pandas
 import numpy as np
 from sklearn.svm import SVC
 from joblib import dump, load
+import os
 
-filename = r'D:\Capstone\CODE\Capstone-system-integration\demo ui\data\single_sample_feature.csv'
+cwd = os.getcwd()
+filename = os.path.join(cwd, "single_sample_feature" + "." + "csv")
+model_path = os.path.join(cwd, "model" + "." + "joblib")
 
 def classfication():
     df: pandas.DataFrame = pandas.read_csv(filename)
@@ -13,7 +16,7 @@ def classfication():
 
 #    load the model from pickles
     sv_classifier = SVC()
-    sv_classifier = load('model.joblib') 
+    sv_classifier = load(model_path) 
     prediction = sv_classifier.predict(X_test)
     print(prediction.tolist()[0])
     return prediction.tolist()[0]

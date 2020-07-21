@@ -8,6 +8,7 @@ from torch.utils.data import DataLoader
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.metrics import classification_report, roc_auc_score
 from joblib import dump, load
+import os
 
 def extract_data(filename: str):
     df: pandas.DataFrame = pandas.read_csv(filename)
@@ -72,16 +73,12 @@ def train(x_data: np.ndarray, y_data: np.ndarray, gamma_values):
 
     return metrics
 
-gamma_values = extract_gamma(r"D:\Capstone\CODE\Capstone-system-integration\demo ui\data\250 Gamma data.csv")
-# processed_data, labels = extract_data(r"D:\Capstone\CODE\Capstone-system-integration\demo ui\data\Feature.csv")
-processed_data, labels = extract_data(r"D:\Capstone\CODE\Capstone-system-integration\demo ui\data\Processed Data.csv")
+cwd = os.getcwd()    
+gamma_path = os.path.join(cwd, "\data\250 Gamma data" + "." + "csv")
+processed_path = os.path.join(cwd, "\data\Processed Data" + "." + "csv")
+    
+gamma_values = extract_gamma(gamma_path)
+processed_data, labels = extract_data(processed_path)
 metrics = train(processed_data, labels, gamma_values)
 print(np.mean(metrics, axis=0))
 
-
-'''
-model_list.append(sv_classifier)
-val_sens, val_spe = metric_generation(prediction, y_test)
-roc_score = roc_auc_score(y_test, prediction)
-metrics.append([val_spe, val_sens, roc_score])
-'''
