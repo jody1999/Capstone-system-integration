@@ -1,4 +1,5 @@
 from PyQt5.QtWidgets import *
+import time
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QPixmap
 from autofocus import autofocus
@@ -8,6 +9,12 @@ from generate_features import generate_features
 import traceback
 from classification import classification
 from PyQt5.QtCore import *
+from getpass import getpass
+
+
+class WorkerSignals(QObject):
+    finished = pyqtSignal()
+    error = pyqtSignal(tuple)
 
 class Worker(QRunnable):
     def __init__(self, fn, *args, **kwargs):
@@ -15,13 +22,19 @@ class Worker(QRunnable):
         self.fn = fn
         self.args = args
         self.kwargs = kwargs
+        self.worker_signals = WorkerSignals()
+
     @pyqtSlot()
     def run(self):
         try:
             result = self.fn(*self.args, **self.kwargs)
         except:
             traceback.print_exec()
-    
+            exctype, value = sys.exc_info()[:2]
+            self.signals.error.emit((exectype, value, traceback.format_exc()))
+        finally:
+            self.worker_signals.finished.emit()
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -109,9 +122,17 @@ class MainWindow(QMainWindow):
         self.main_btn.setStyleSheet("QPushButton{font-size: 28px;font-family: Arial;color: rgb(255, 255, 255);background-color: rgba(0, 255, 255, 0); border: 0px}")        
         self.main_btn.clicked.connect(self.button_function)
         self.threadpool = QThreadPool()
-        
+        self.threadpool.setMaxThreadCount(3)
+        self.thread_execute()
+       
+    def thread_finished(self):
+        print("Thread Complete")
+ 
     def thread_execute(self):
         worker = Worker(self.rfid)
+        worker.worker_signals.finished.connect(self.thread_finished)
+        self.threadpool.start(worker)
+        worker = Worker(self.get_patient_id)
         self.threadpool.start(worker)
 
 
@@ -125,11 +146,17 @@ class MainWindow(QMainWindow):
         self.main_btn.setText("Press after Scan \n Patient Barcode")
         self.barcode_image = QPixmap('barcode.png').scaled(150, 90, QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
         self.scan_label.setPixmap(self.barcode_image)
+
+
+    def get_patient_id(self):
+        self.patientID = input("")
+        print(self.patientID)
+        self.patient_id.setText(self.patientID)
                 
 #     for mannual working flow 
     def button_function(self):
         if self.count == -1:
-            self.rfid()
+            pass
         elif self.count == 1:            
             self.step1()
         elif self.count == 3:
@@ -187,7 +214,7 @@ class MainWindow(QMainWindow):
 #         autofocusing of optics system 
         while autofocus():
             self.main_btn.setText("Auto focusing")
-        self.count = 4    
+        self.count = 4 
         self.step4() # automatic shift to next step
         
         
@@ -211,19 +238,26 @@ class MainWindow(QMainWindow):
         self.label_8.setPixmap(self.green)   
         self.label_9.setPixmap(self.grey)    
         self.main_btn.setText("Data Conversion \n in Progress")
-        
+    
+
     def step7(self):  # data analysis: get features, classify, store the data
         self.label_4.setStyleSheet("font: 75 11pt \"MS Shell Dlg 2\";color: grey;")
         self.label_5.setStyleSheet("font: 75 11pt \"MS Shell Dlg 2\";color: black;")
         self.label_9.setPixmap(self.green)   
         self.label_10.setPixmap(self.grey)    
         self.main_btn.setText("Data Analysis \n in Progress")
-        
-        # get feature from raw csv # then classify
+         
+        # classify
+         # get feature from raw csv
         generate_features()
+
         self.result = (classification() == 1)
         print(self.result)
  
+        self.label_4.setStyleSheet("font: 75 11pt \"MS Shell Dlg 2\";color: black;")
+        self.label_10.setPixmap(self.green)
+
+
         # store the data
 #         data_entries = (self.patient_id_str, self.patient_nric, self.staff_id_str, self.time, self.classification, self.WBC_count, self.RBC_count, self.raw_video_id)
 #         store_data(data_entries)
