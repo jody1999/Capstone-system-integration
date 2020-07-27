@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import *
 import time
+from pynput.keyboard import Key, Controller
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QPixmap
 from autofocus import autofocus
@@ -29,12 +30,11 @@ class Worker(QRunnable):
         try:
             result = self.fn(*self.args, **self.kwargs)
         except:
-            traceback.print_exec()
+            traceback.print_exc()
             exctype, value = sys.exc_info()[:2]
-            self.signals.error.emit((exectype, value, traceback.format_exc()))
+            self.worker_signals.error.emit((exctype, value, traceback.format_exc()))
         finally:
             self.worker_signals.finished.emit()
-
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -121,45 +121,57 @@ class MainWindow(QMainWindow):
         self.main_btn.setText("Press and tap \n Staff ID to login")
         self.main_btn.setStyleSheet("QPushButton{font-size: 28px;font-family: Arial;color: rgb(255, 255, 255);background-color: rgba(0, 255, 255, 0); border: 0px}")        
         self.main_btn.clicked.connect(self.button_function)
+        self.staff_id.setEnabled(False)
+        self.patient_id.setEnabled(False)
+        self.user_id = ""
+        self.patient = ""
+        self.process = QProcess(self)
         self.threadpool = QThreadPool()
         self.threadpool.setMaxThreadCount(3)
         self.thread_execute()
-       
-    def thread_finished(self):
-        print("Thread Complete")
- 
+
+
     def thread_execute(self):
         worker = Worker(self.rfid)
-        worker.worker_signals.finished.connect(self.thread_finished)
+        worker.worker_signals.finished.connect(self.set_elements)
         self.threadpool.start(worker)
-        worker = Worker(self.get_patient_id)
-        self.threadpool.start(worker)
+        
+        worker2 = Worker(self.get_patient)
+        worker2.worker_signals.finished.connect(self.set_patient)
+        self.threadpool.start(worker2)
 
-
-    def rfid(self):
-#     card tap and read user id 
-        #self.main_btn.setText("Tap Staff ID \n to Login")
-        self.staff_id_str = card_tap() 
-        self.staff_id.setText(str(self.staff_id_str))
+    def set_elements(self):
+        
+        self.staff_id.setText(self.user_id)
         
         self.count = 0
         self.main_btn.setText("Press after Scan \n Patient Barcode")
         self.barcode_image = QPixmap('barcode.png').scaled(150, 90, QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
         self.scan_label.setPixmap(self.barcode_image)
 
+    def rfid(self):
+#     card tap and read user id 
+        #self.main_btn.setText("Tap Staff ID \n to Login")
+        self.user_id = str(card_tap())
 
-    def get_patient_id(self):
-        self.patientID = input("")
-        print(self.patientID)
-        self.patient_id.setText(self.patientID)
-                
+    def get_patient(self):
+        self.patient = getpass(prompt="")
+        print(self.patient)
+
+    def set_patient(self):
+        self.patient_id.setText(self.patient)
+        if self.staff_id != "":
+            self.step1()
+        else:
+            sys.exit(0)
+        
+        
+    
+
+
 #     for mannual working flow 
     def button_function(self):
-        if self.count == -1:
-            pass
-        elif self.count == 1:            
-            self.step1()
-        elif self.count == 3:
+        if self.count == 3:
             self.step3()
         elif self.count == 4:
             self.step4()
@@ -175,6 +187,7 @@ class MainWindow(QMainWindow):
             
 
     def step1(self):  # pressure clamp,switch init; optics home
+        self.patient_id.setEnabled(False)
         self.count = 2
         self.main_btn.setText("Prepare and \n Insert Test Chip")
         self.loading = QPixmap('red bar.png')
@@ -185,8 +198,6 @@ class MainWindow(QMainWindow):
 
 #         initiating of the pressure system 
      
-    
-    
 
         self.start_btn.setStyleSheet("background-color: rgba(0, 255, 255, 0);background-image: url('Start button.png');")
         self.loading = QPixmap('green bar.png')
@@ -204,8 +215,7 @@ class MainWindow(QMainWindow):
         self.loading_label.setGeometry(QtCore.QRect(300, 80, 430, 430))
         movie = QtGui.QMovie("loading.gif")
         self.loading_label.setMovie(movie)
-        movie.start()
-        
+        movie.start() 
         self.label.setStyleSheet("font: 75 11pt \"MS Shell Dlg 2\";color: black;")
         self.label_6.setPixmap(self.grey)    
                 
