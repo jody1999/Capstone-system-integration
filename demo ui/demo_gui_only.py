@@ -2,9 +2,24 @@ from PyQt5.QtWidgets import *
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QPixmap
 from autofocus import autofocus
+from login import *
 
 
 class MainWindow(QMainWindow):
+    
+    def openwindow(self):
+        self.window = QtWidgets.QMainWindow()
+        self.ui = Ui_Form()
+        self.ui.setupUi(self.window)
+        self.window.show()
+        
+    def btn_exit_handler(self):                
+        
+        self.close()
+        self.openwindow()
+        
+        
+        
     def __init__(self):
         super().__init__()
         self.count = 0
@@ -80,7 +95,9 @@ class MainWindow(QMainWindow):
         self.cancel_btn = QtWidgets.QPushButton(self.centralwidget)
         self.cancel_btn.setGeometry(QtCore.QRect(30, 500, 190, 60))
         self.cancel_btn.setStyleSheet("background-color: rgba(0, 255, 255, 0);") 
-        self.cancel_btn.clicked.connect(QApplication.instance().quit)
+#         self.cancel_btn.clicked.connect(QApplication.instance().quit)
+        self.cancel_btn.clicked.connect(self.btn_exit_handler)    
+        
         
         self.start_btn = QtWidgets.QPushButton(self.centralwidget)
         self.start_btn.setGeometry(QtCore.QRect(740, 500, 220, 65))

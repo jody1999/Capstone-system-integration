@@ -11,6 +11,7 @@ import traceback
 from classification import classification
 from PyQt5.QtCore import *
 from getpass import getpass
+from login import *
 
 
 class WorkerSignals(QObject):
@@ -37,6 +38,18 @@ class Worker(QRunnable):
             self.worker_signals.finished.emit()
 
 class MainWindow(QMainWindow):
+        
+    def openwindow(self):
+        self.window = QtWidgets.QMainWindow()
+        self.ui = Ui_Form()
+        self.ui.setupUi(self.window)
+        self.window.show()
+        
+    def btn_exit_handler(self):                        
+        self.close()
+        self.openwindow()
+        
+        
     def __init__(self):
         super().__init__()
         self.count = -1
@@ -107,7 +120,10 @@ class MainWindow(QMainWindow):
         self.cancel_btn = QtWidgets.QPushButton(self.centralwidget)
         self.cancel_btn.setGeometry(QtCore.QRect(30, 500, 190, 60))
         self.cancel_btn.setStyleSheet("background-color: rgba(0, 255, 255, 0);border:0px") 
-        self.cancel_btn.clicked.connect(QApplication.instance().quit)        
+#         self.cancel_btn.clicked.connect(QApplication.instance().quit)   
+        self.cancel_btn.clicked.connect(self.btn_exit_handler)    
+
+        
         self.start_btn = QtWidgets.QPushButton(self.centralwidget)
         self.start_btn.setGeometry(QtCore.QRect(740, 500, 220, 65))
         self.start_btn.setStyleSheet("background-color: rgba(0, 255, 255, 0);border:0px;")  
@@ -165,9 +181,6 @@ class MainWindow(QMainWindow):
         else:
             sys.exit(0)
         
-        
-    
-
 
 #     for mannual working flow 
     def button_function(self):
