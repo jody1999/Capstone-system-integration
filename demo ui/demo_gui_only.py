@@ -18,13 +18,13 @@ class MainWindow(QMainWindow):
         
     def btn_exit_handler(self):                        
         self.close()       
-        self.login_page()
+#         self.login_page()
         
     def new_patient_instance(self):
         self.close() 
         self.new_main_page()
         
-        
+                
         
     def __init__(self, staff_id_value):
         super().__init__()

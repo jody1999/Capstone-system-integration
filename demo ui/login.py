@@ -11,8 +11,7 @@ class Ui_Form(QMainWindow):
         self.ui = MainWindow(staff_id_value)
         self.ui.resize(1024, 600)
         self.ui.show()
-        self.close()
-#         self.hide()
+#         self.close()
 
     def __init__(self):
         super().__init__()
@@ -38,6 +37,7 @@ class Ui_Form(QMainWindow):
         ####
         # activate the rfid reading
         # once read, call function btn_login_handler()
+        self.btn_login_handler()
 
 
     def pop_window(self,text):

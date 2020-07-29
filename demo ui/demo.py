@@ -6,7 +6,7 @@ from PyQt5.QtGui import QPixmap
 from autofocus import autofocus
 from gpio_test import card_tap
 from generate_features import generate_features
-#from data_storage import store_data
+from data_storage import store_data
 import traceback
 from classification import classification
 from PyQt5.QtCore import *
@@ -38,10 +38,10 @@ class Worker(QRunnable):
 
             
 class MainWindow(QMainWindow):        
-    def login_page(self):
-        self.ui = Ui_Form()
-        self.ui.resize(1024, 600)        
-        self.ui.show()
+#     def login_page(self):
+#         self.ui = Ui_Form()
+#         self.ui.resize(1024, 600)        
+#         self.ui.show()
         
     def new_main_page(self):
         self.ui = MainWindow(self.staff_id_value)
@@ -50,7 +50,6 @@ class MainWindow(QMainWindow):
         
     def btn_exit_handler(self):                        
         self.close()       
-        self.login_page()
         
     def new_patient_instance(self):
         self.close() 
@@ -298,9 +297,6 @@ class MainWindow(QMainWindow):
         self.label_10.setPixmap(self.green)
 
 
-        # store the data
-#         data_entries = (self.patient_id_str, self.patient_nric, self.staff_id_str, self.time, self.classification, self.WBC_count, self.RBC_count, self.raw_video_id)
-#         store_data(data_entries)
        # self.step8()
         
         
@@ -315,6 +311,10 @@ class MainWindow(QMainWindow):
             self.main_btn.setText("Result: Positive")
         else:
             self.main_btn.setText("Result: Negative")
+            
+        # store the data
+        data_entries = (self.patient_id_str, self.patient_nric, self.staff_id_str, self.time, self.classification, self.WBC_count, self.RBC_count, self.raw_video_id)
+        store_data(data_entries)
 
 
 '''
