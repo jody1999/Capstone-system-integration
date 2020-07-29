@@ -5,24 +5,31 @@ from autofocus import autofocus
 from login import *
 
 
-class MainWindow(QMainWindow):
-    
-    def openwindow(self):
-        self.window = QtWidgets.QMainWindow()
+class MainWindow(QMainWindow):    
+    def login_page(self):
         self.ui = Ui_Form()
-        self.ui.setupUi(self.window)
-        self.window.show()
+        self.ui.resize(1024, 600)        
+        self.ui.show()
         
-    def btn_exit_handler(self):                
+    def new_main_page(self):
+        self.ui = MainWindow(self.staff_id_value)
+        self.ui.resize(1024, 600)        
+        self.ui.show()
         
-        self.close()
-        self.openwindow()
+    def btn_exit_handler(self):                        
+        self.close()       
+        self.login_page()
+        
+    def new_patient_instance(self):
+        self.close() 
+        self.new_main_page()
         
         
         
-    def __init__(self):
+    def __init__(self, staff_id_value):
         super().__init__()
-        self.count = 0
+        self.staff_id_value = staff_id_value
+        self.count = 1
         self.green = QPixmap('green tick.png').scaled(32, 32, QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
         self.grey = QPixmap('grey tick.png').scaled(32, 32, QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
         self.white = QPixmap('white tick.png').scaled(32, 32, QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
@@ -81,6 +88,7 @@ class MainWindow(QMainWindow):
         self.staff_id = QtWidgets.QLineEdit(self.centralwidget)
         self.staff_id.setGeometry(QtCore.QRect(160, 30, 200, 45))
         self.staff_id.setStyleSheet("border: 0px solid blue")
+        self.staff_id.setText(self.staff_id_value)
 
         
         self.patient_id = QtWidgets.QLineEdit(self.centralwidget)
@@ -97,30 +105,31 @@ class MainWindow(QMainWindow):
         self.cancel_btn.setStyleSheet("background-color: rgba(0, 255, 255, 0);") 
 #         self.cancel_btn.clicked.connect(QApplication.instance().quit)
         self.cancel_btn.clicked.connect(self.btn_exit_handler)    
-        
-        
+    
+        self.new_patient_btn = QtWidgets.QPushButton(self.centralwidget)
+        self.new_patient_btn.setGeometry(QtCore.QRect(30, 390, 190, 60))
+        self.new_patient_btn.setStyleSheet("background-color: rgba(0, 255, 255, 0);") 
+        self.new_patient_btn.clicked.connect(self.new_patient_instance)    
+                
         self.start_btn = QtWidgets.QPushButton(self.centralwidget)
         self.start_btn.setGeometry(QtCore.QRect(740, 500, 220, 65))
         self.start_btn.setStyleSheet("background-color: rgba(0, 255, 255, 0);")   
         self.start_btn.clicked.connect(self.step3)
-               
-            
+                           
         self.scan_label = QtWidgets.QLabel(self.centralwidget)
-        self.scan_label.setGeometry(QtCore.QRect(440, 330, 200,100))        
-        self.sacn_image = QPixmap('RIFD Sign.png').scaled(150, 90, QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
-        self.scan_label.setPixmap(self.sacn_image)     
+        self.scan_label.setGeometry(QtCore.QRect(440, 330, 200,100))                  
+        self.barcode_image = QPixmap('barcode.png').scaled(150, 90, QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
+        self.scan_label.setPixmap(self.barcode_image)      
         
         self.main_btn = QtWidgets.QPushButton(self.centralwidget)
         self.main_btn.setGeometry(QtCore.QRect(378, 170, 260, 260))
-        self.main_btn.setText("Tap Staff ID \n to Login")
+        self.main_btn.setText("Scan Patient \n Barcode")
         self.main_btn.setStyleSheet("QPushButton{font-size: 28px;font-family: Arial;color: rgb(255, 255, 255);background-color: rgba(0, 255, 255, 0);}")        
         self.main_btn.clicked.connect(self.button_function)
-            
+    
     
     def button_function(self):
-        if self.count == 0:            
-            self.barcode()
-        elif self.count == 1:            
+        if self.count == 1:            
             self.step1()
         elif self.count == 2:
             self.step2()
@@ -140,11 +149,6 @@ class MainWindow(QMainWindow):
             
         
         
-    def barcode(self):
-        self.main_btn.setText("Scan Patient \n Barcode")
-        self.staff_id.setText("Technician Kerwin") 
-        self.barcode_image = QPixmap('barcode.png').scaled(150, 90, QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
-        self.scan_label.setPixmap(self.barcode_image) 
         
         
     def step1(self):
@@ -233,20 +237,23 @@ step7: data analytics progress {loading; check list; 4 green, 1 grey, 0 white ci
 step8: showing result {green bar}
 '''
     
-
 stylesheet = """
     MainWindow {
         background-image: url("bg.png"); 
         background-repeat: no-repeat; 
         background-position: center;
     }
+    Ui_Form {
+        background-image: url("login_bg.png"); 
+        background-repeat: no-repeat; 
+        background-position: center;
+    }
 """
-
 if __name__ == "__main__":
     import sys
     app = QApplication(sys.argv)
     app.setStyleSheet(stylesheet)     
-    window = MainWindow()
+    window = MainWindow('123')
     window.resize(1024, 600)
     window.show()
     sys.exit(app.exec_())

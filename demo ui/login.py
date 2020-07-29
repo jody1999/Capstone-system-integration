@@ -1,40 +1,44 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-# from main_gui import  *
 from demo import  *
 from PyQt5 import QtWidgets
 import sqlite3
 
 
-class Ui_Form(object):
+class Ui_Form(QMainWindow):
 
-    def openwindow(self):
-        self.window = QtWidgets.QMainWindow()
-        print('open main window')
-        self.ui = MainWindow()
+    def openwindow(self, staff_id_value):
+        print('start new patient instance')
+        self.ui = MainWindow(staff_id_value)
         self.ui.resize(1024, 600)
         self.ui.show()
-        Form.hide()
+        self.close()
+#         self.hide()
 
-    def setupUi(self, Form):
-        Form.resize(1024, 600)
-        self.textBrowser = QtWidgets.QLabel("LOGO",Form)
-        self.textBrowser.setGeometry(QtCore.QRect(150, 10, 361, 61))
-        self.gridLayoutWidget = QtWidgets.QWidget(Form)
-        self.gridLayoutWidget.setGeometry(QtCore.QRect(100, 90, 431, 261))
-        self.gridLayoutWidget.setObjectName("gridLayoutWidget")
-        self.gridLayout = QtWidgets.QGridLayout(self.gridLayoutWidget)
-        self.gridLayout.setContentsMargins(0, 0, 0, 0)
-       
-        self.l_username = QtWidgets.QLabel('username',self.gridLayoutWidget)
-        self.gridLayout.addWidget(self.l_username, 0, 0, 1, 1)
-        self.txt_username = QtWidgets.QLineEdit(self.gridLayoutWidget)
-        self.gridLayout.addWidget(self.txt_username, 0, 1, 1, 1)
+    def __init__(self):
+        super().__init__()
+        self.staff_id_value = ''
+        self.gridLayoutWidget = QtWidgets.QWidget()
+        self.setCentralWidget(self.gridLayoutWidget)   
+    
+        # to be replace by the RFID code
+        self.staff_id = QtWidgets.QLineEdit(self.gridLayoutWidget)
+        self.staff_id.setGeometry(QtCore.QRect(160, 30, 200, 45))
+        self.staff_id.setStyleSheet("background-color: rgba(0, 255, 255, 0);border: 0px solid blue") 
         
-        self.btn_next = QtWidgets.QPushButton('Next',self.gridLayoutWidget)
-        self.gridLayout.addWidget(self.btn_next, 2, 1, 1, 1)
+        self.btn_next = QtWidgets.QPushButton(self.gridLayoutWidget)    
+        self.btn_next.setGeometry(QtCore.QRect(378, 170, 260, 260))
+        self.btn_next.setStyleSheet("QPushButton{font-size: 28px;font-family: Arial;color: rgb(255, 255, 255);background-color: rgba(0, 255, 255, 0);}")     
+        self.btn_next.setText("CLICK TO START")
         
-        QtCore.QMetaObject.connectSlotsByName(Form)
-        self.btn_next.clicked.connect(self.btn_login_handler)
+        QtCore.QMetaObject.connectSlotsByName(self.gridLayoutWidget)
+        self.btn_next.clicked.connect(self.button)
+        
+    def button(self):
+        self.btn_next.setText("Tap Staff ID \n to Login")
+        ####
+        # activate the rfid reading
+        # once read, call function btn_login_handler()
+
 
     def pop_window(self,text):
         msg = QtWidgets.QMessageBox()
@@ -44,7 +48,7 @@ class Ui_Form(object):
         msg.exec_()
        
     def btn_login_handler(self):
-        username = self.txt_username.text()
+        username = self.staff_id.text()
         conn = sqlite3.connect('user.db')
         cursor = conn.cursor()
         
@@ -58,11 +62,11 @@ class Ui_Form(object):
                     break
         if valid:
             print('Welcome')
-            self.openwindow()
+#             self.openwindow(username)
+            self.openwindow('passed from login')
         else:
             print('No user Found')
             self.pop_window('No user Found')
-
         
 stylesheet = """
     MainWindow {
@@ -70,14 +74,17 @@ stylesheet = """
         background-repeat: no-repeat; 
         background-position: center;
     }
+    Ui_Form {
+        background-image: url("login_bg.png"); 
+        background-repeat: no-repeat; 
+        background-position: center;
+    }
 """
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
-    app.setStyleSheet(stylesheet)   
-    
-    Form = QtWidgets.QWidget()
+    app.setStyleSheet(stylesheet)       
     ui = Ui_Form()
-    ui.setupUi(Form)
-    Form.show()
+    ui.resize(1024, 600)
+    ui.show()
     sys.exit(app.exec_())

@@ -13,7 +13,6 @@ from PyQt5.QtCore import *
 from getpass import getpass
 from login import *
 
-
 class WorkerSignals(QObject):
     finished = pyqtSignal()
     error = pyqtSignal(tuple)
@@ -37,20 +36,28 @@ class Worker(QRunnable):
         finally:
             self.worker_signals.finished.emit()
 
-class MainWindow(QMainWindow):
-        
-    def openwindow(self):
-        self.window = QtWidgets.QMainWindow()
+            
+class MainWindow(QMainWindow):        
+    def login_page(self):
         self.ui = Ui_Form()
-        self.ui.setupUi(self.window)
-        self.window.show()
+        self.ui.resize(1024, 600)        
+        self.ui.show()
+        
+    def new_main_page(self):
+        self.ui = MainWindow(self.staff_id_value)
+        self.ui.resize(1024, 600)        
+        self.ui.show()
         
     def btn_exit_handler(self):                        
-        self.close()
-        self.openwindow()
+        self.close()       
+        self.login_page()
+        
+    def new_patient_instance(self):
+        self.close() 
+        self.new_main_page()
         
         
-    def __init__(self):
+    def __init__(self, staff_id_value):
         super().__init__()
         self.count = -1
         self.green = QPixmap('green tick.png').scaled(32, 32, QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
@@ -110,33 +117,43 @@ class MainWindow(QMainWindow):
         ## IDs 
         self.staff_id = QtWidgets.QLineEdit(self.centralwidget)
         self.staff_id.setGeometry(QtCore.QRect(160, 30, 200, 45))
-        self.staff_id.setStyleSheet("border: 0px solid blue")        
+        self.staff_id.setStyleSheet("border: 0px solid blue")    
+        self.staff_id.setText(staff_id_value)
+        
         self.patient_id = QtWidgets.QLineEdit(self.centralwidget)
         self.patient_id.setGeometry(QtCore.QRect(760, 30, 200, 45))
         self.patient_id.setStyleSheet("border: 0px solid blue")        
         self.loading_label = QtWidgets.QLabel(self.centralwidget)        
         self.loading_label.setGeometry(QtCore.QRect(326, 80, 430, 430))                   
+        
         # Buttons
         self.cancel_btn = QtWidgets.QPushButton(self.centralwidget)
         self.cancel_btn.setGeometry(QtCore.QRect(30, 500, 190, 60))
         self.cancel_btn.setStyleSheet("background-color: rgba(0, 255, 255, 0);border:0px") 
-#         self.cancel_btn.clicked.connect(QApplication.instance().quit)   
         self.cancel_btn.clicked.connect(self.btn_exit_handler)    
-
+        
+        self.new_patient_btn = QtWidgets.QPushButton(self.centralwidget)
+        self.new_patient_btn.setGeometry(QtCore.QRect(30, 390, 190, 60))
+        self.new_patient_btn.setStyleSheet("background-color: rgba(0, 255, 255, 0);") 
+        self.new_patient_btn.clicked.connect(self.new_patient_instance)    
         
         self.start_btn = QtWidgets.QPushButton(self.centralwidget)
         self.start_btn.setGeometry(QtCore.QRect(740, 500, 220, 65))
         self.start_btn.setStyleSheet("background-color: rgba(0, 255, 255, 0);border:0px;")  
         self.start_btn.clicked.connect(self.step3)
+        
         self.scan_label = QtWidgets.QLabel(self.centralwidget)
-        self.scan_label.setGeometry(QtCore.QRect(440, 330, 200,100))        
-        self.sacn_image = QPixmap('RIFD Sign.png').scaled(150, 90, QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
-        self.scan_label.setPixmap(self.sacn_image)             
+        self.scan_label.setGeometry(QtCore.QRect(440, 330, 200,100))                  
+        self.barcode_image = QPixmap('barcode.png').scaled(150, 90, QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
+        self.scan_label.setPixmap(self.barcode_image)      
+        
+        
         self.main_btn = QtWidgets.QPushButton(self.centralwidget)
         self.main_btn.setGeometry(QtCore.QRect(378, 170, 260, 260))
-        self.main_btn.setText("Press and tap \n Staff ID to login")
-        self.main_btn.setStyleSheet("QPushButton{font-size: 28px;font-family: Arial;color: rgb(255, 255, 255);background-color: rgba(0, 255, 255, 0); border: 0px}")        
+        self.main_btn.setText("Scan Patient \n Barcode")
+        self.main_btn.setStyleSheet("QPushButton{font-size: 28px;font-family: Arial;color: rgb(255, 255, 255);background-color: rgba(0, 255, 255, 0);}")        
         self.main_btn.clicked.connect(self.button_function)
+        
         self.staff_id.setEnabled(False)
         self.patient_id.setEnabled(False)
         self.user_id = ""
@@ -318,13 +335,18 @@ stylesheet = """
         background-repeat: no-repeat; 
         background-position: center;
     }
+    Ui_Form {
+        background-image: url("login_bg.png"); 
+        background-repeat: no-repeat; 
+        background-position: center;
+    }
 """
 
 if __name__ == "__main__":
     import sys
     app = QApplication(sys.argv)
     app.setStyleSheet(stylesheet)     
-    window = MainWindow()
+    window = MainWindow('1234')
     window.showFullScreen()
     window.resize(1024, 600)
     window.show()
