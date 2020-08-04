@@ -18,6 +18,5 @@ def card_tap():
     except KeyboardInterrupt:
         GPIO.cleanup()
         raise
-    return id
 
 

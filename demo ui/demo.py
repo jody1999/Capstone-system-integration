@@ -133,7 +133,7 @@ class MainWindow(QMainWindow):
         
         self.new_patient_btn = QtWidgets.QPushButton(self.centralwidget)
         self.new_patient_btn.setGeometry(QtCore.QRect(30, 390, 190, 60))
-        self.new_patient_btn.setStyleSheet("background-color: rgba(0, 255, 255, 0);") 
+        self.new_patient_btn.setStyleSheet("background-color: rgba(0, 255, 255, 0); border:0px")
         self.new_patient_btn.clicked.connect(self.new_patient_instance)    
         
         self.start_btn = QtWidgets.QPushButton(self.centralwidget)
@@ -150,52 +150,15 @@ class MainWindow(QMainWindow):
         self.main_btn = QtWidgets.QPushButton(self.centralwidget)
         self.main_btn.setGeometry(QtCore.QRect(378, 170, 260, 260))
         self.main_btn.setText("Scan Patient \n Barcode")
-        self.main_btn.setStyleSheet("QPushButton{font-size: 28px;font-family: Arial;color: rgb(255, 255, 255);background-color: rgba(0, 255, 255, 0);}")        
+        self.main_btn.setStyleSheet("QPushButton{font-size: 28px;font-family: Arial;color: rgb(255, 255, 255);background-color: rgba(0, 255, 255, 0); border: 0px;}")
         self.main_btn.clicked.connect(self.button_function)
         
         self.staff_id.setEnabled(False)
-        self.patient_id.setEnabled(False)
+        # self.patient_id.setEnabled(False)
         self.user_id = ""
         self.patient = ""
         self.process = QProcess(self)
-        self.threadpool = QThreadPool()
-        self.threadpool.setMaxThreadCount(3)
-        self.thread_execute()
 
-
-    def thread_execute(self):
-        worker = Worker(self.rfid)
-        worker.worker_signals.finished.connect(self.set_elements)
-        self.threadpool.start(worker)
-        
-        worker2 = Worker(self.get_patient)
-        worker2.worker_signals.finished.connect(self.set_patient)
-        self.threadpool.start(worker2)
-
-    def set_elements(self):
-        
-        self.staff_id.setText(self.user_id)
-        
-        self.count = 0
-        self.main_btn.setText("Press after Scan \n Patient Barcode")
-        self.barcode_image = QPixmap('barcode.png').scaled(150, 90, QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
-        self.scan_label.setPixmap(self.barcode_image)
-
-    def rfid(self):
-#     card tap and read user id 
-        #self.main_btn.setText("Tap Staff ID \n to Login")
-        self.user_id = str(card_tap())
-
-    def get_patient(self):
-        self.patient = getpass(prompt="")
-        print(self.patient)
-
-    def set_patient(self):
-        self.patient_id.setText(self.patient)
-        if self.staff_id != "":
-            self.step1()
-        else:
-            sys.exit(0)
         
 
 #     for mannual working flow 
