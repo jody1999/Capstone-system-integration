@@ -12,8 +12,6 @@ def card_tap():
         while True:
             id, text = reader.read()
             return id
-#             print(id)
-#             print(text)
             sleep(5)
     except KeyboardInterrupt:
         GPIO.cleanup()
