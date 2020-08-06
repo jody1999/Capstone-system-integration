@@ -1,8 +1,14 @@
 from PyQt5.QtWidgets import *
+import pandas as pd
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QPixmap
 from autofocus import autofocus
 from login import *
+from detection_presentation import main
+from generate_features import generate_features
+from data_storage import store_data
+from datetime import datetime
+from classification import classification
 
 
 class MainWindow(QMainWindow):    
@@ -102,18 +108,18 @@ class MainWindow(QMainWindow):
         # Buttons
         self.cancel_btn = QtWidgets.QPushButton(self.centralwidget)
         self.cancel_btn.setGeometry(QtCore.QRect(30, 500, 190, 60))
-        self.cancel_btn.setStyleSheet("background-color: rgba(0, 255, 255, 0);") 
+        self.cancel_btn.setStyleSheet("background-color: rgba(0, 255, 255, 0); border:0px")
 #         self.cancel_btn.clicked.connect(QApplication.instance().quit)
         self.cancel_btn.clicked.connect(self.btn_exit_handler)    
     
         self.new_patient_btn = QtWidgets.QPushButton(self.centralwidget)
         self.new_patient_btn.setGeometry(QtCore.QRect(30, 390, 190, 60))
-        self.new_patient_btn.setStyleSheet("background-color: rgba(0, 255, 255, 0);") 
+        self.new_patient_btn.setStyleSheet("background-color: rgba(0, 255, 255, 0); border: 0px") 
         self.new_patient_btn.clicked.connect(self.new_patient_instance)    
                 
         self.start_btn = QtWidgets.QPushButton(self.centralwidget)
         self.start_btn.setGeometry(QtCore.QRect(740, 500, 220, 65))
-        self.start_btn.setStyleSheet("background-color: rgba(0, 255, 255, 0);")   
+        self.start_btn.setStyleSheet("background-color: rgba(0, 255, 255, 0); border:0px")   
         self.start_btn.clicked.connect(self.step3)
                            
         self.scan_label = QtWidgets.QLabel(self.centralwidget)
@@ -124,7 +130,7 @@ class MainWindow(QMainWindow):
         self.main_btn = QtWidgets.QPushButton(self.centralwidget)
         self.main_btn.setGeometry(QtCore.QRect(378, 170, 260, 260))
         self.main_btn.setText("Scan Patient \n Barcode")
-        self.main_btn.setStyleSheet("QPushButton{font-size: 28px;font-family: Arial;color: rgb(255, 255, 255);background-color: rgba(0, 255, 255, 0);}")        
+        self.main_btn.setStyleSheet("QPushButton{font-size: 28px;font-family: Arial;color: rgb(255, 255, 255);background-color: rgba(0, 255, 255, 0); border:0px}")        
         self.main_btn.clicked.connect(self.button_function)
     
     
@@ -166,7 +172,7 @@ class MainWindow(QMainWindow):
 
 
     def step2(self):
-        self.start_btn.setStyleSheet("background-color: rgba(0, 255, 255, 0);background-image: url('Start button.png');")
+        self.start_btn.setStyleSheet("background-color: rgba(0, 255, 255, 0);background-image: url('Start button.png'); border:0px")
         self.loading = QPixmap('green bar.png')
         self.loading_label.setPixmap(self.loading)  
         self.main_btn.setText("Press Start \n to Begin the Test")
@@ -174,7 +180,7 @@ class MainWindow(QMainWindow):
 
     def step3(self):
         self.count = 4
-        self.start_btn.setStyleSheet("background-color: rgba(0, 255, 255, 0);")   
+        self.start_btn.setStyleSheet("background-color: rgba(0, 255, 255, 0); border:0px")   
         self.formLayoutWidget.show()
         self.formLayoutWidget_2.show()
         self.main_btn.setText("Preparation \n in Progress")
@@ -206,13 +212,22 @@ class MainWindow(QMainWindow):
         self.label_8.setPixmap(self.green)   
         self.label_9.setPixmap(self.grey)    
         self.main_btn.setText("Data Conversion \n in Progress")
+
+        main()
+        self.raw_count = pd.read_csv("raw_count.csv")
+        print("data conversion finished. raw count csv stored.")
         
     def step7(self):
+        generate_features()
+        self.result = (classification() == 1)
+        print(self.result)
+
         self.label_4.setStyleSheet("font: 75 11pt \"MS Shell Dlg 2\";color: grey;")
         self.label_5.setStyleSheet("font: 75 11pt \"MS Shell Dlg 2\";color: black;")
         self.label_9.setPixmap(self.green)   
         self.label_10.setPixmap(self.grey)    
         self.main_btn.setText("Data Analysis \n in Progress")
+        
         
         
     def step8(self):
@@ -222,7 +237,17 @@ class MainWindow(QMainWindow):
         self.loading_label.setGeometry(QtCore.QRect(326, 80, 430, 430))
         self.loading = QPixmap('green bar.png')
         self.loading_label.setPixmap(self.loading)  
-        self.main_btn.setText("Result: ")
+        if self.result:  # classification == 1
+            self.main_btn.setText("Result: Positive")
+        else:
+            self.main_btn.setText("Result: Negative")
+
+        self.time = datetime.now()
+        # store the data
+        data_entries = (self.patient_id_str, self.patient_nric, self.staff_id_str, self.time, self.result, self.raw_count, self.video_id)
+        store_data(data_entries)
+        print("stored into database")
+
         
 
        
@@ -255,5 +280,6 @@ if __name__ == "__main__":
     app.setStyleSheet(stylesheet)     
     window = MainWindow('123')
     window.resize(1024, 600)
+    window.showFullScreen() 
     window.show()
     sys.exit(app.exec_())

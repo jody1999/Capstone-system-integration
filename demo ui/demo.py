@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import *
 import time
+from datetime import datetime
 from pynput.keyboard import Key, Controller
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QPixmap
@@ -59,6 +60,11 @@ class MainWindow(QMainWindow):
     def __init__(self, staff_id_value):
         super().__init__()
         self.count = -1
+        self.WBC_count = None
+        self.RBC_count = None
+        self.video_id = None
+        self.time = datetime.now()
+         
         self.green = QPixmap('green tick.png').scaled(32, 32, QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
         self.grey = QPixmap('grey tick.png').scaled(32, 32, QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
         self.white = QPixmap('white tick.png').scaled(32, 32, QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation)
@@ -82,6 +88,12 @@ class MainWindow(QMainWindow):
         self.verticalLayout.addWidget(self.label_3)        
         self.label_4 = QtWidgets.QLabel('Data Conversion',self.formLayoutWidget)
         self.label_4.setStyleSheet("font: 75 11pt \"MS Shell Dlg 2\";color: grey;")
+        self.verticalLayout.addWidget(self.label_4)
+        self.label_5 = QtWidgets.QLabel('Data Analysis',self.formLayoutWidget)
+        self.label_5.setStyleSheet("font: 75 11pt \"MS Shell Dlg 2\";color: grey;")
+        self.verticalLayout.addWidget(self.label_5)
+        
+        self.formLayoutWidget_2 = QtWidgets.QWidget(self.centralwidget)
         self.verticalLayout.addWidget(self.label_4)
         self.label_5 = QtWidgets.QLabel('Data Analysis',self.formLayoutWidget)
         self.label_5.setStyleSheet("font: 75 11pt \"MS Shell Dlg 2\";color: grey;")
@@ -150,16 +162,17 @@ class MainWindow(QMainWindow):
         self.main_btn = QtWidgets.QPushButton(self.centralwidget)
         self.main_btn.setGeometry(QtCore.QRect(378, 170, 260, 260))
         self.main_btn.setText("Scan Patient \n Barcode")
-        self.main_btn.setStyleSheet("QPushButton{font-size: 28px;font-family: Arial;color: rgb(255, 255, 255);background-color: rgba(0, 255, 255, 0); border: 0px;}")
-        self.main_btn.clicked.connect(self.button_function)
-        
-        self.staff_id.setEnabled(False)
-        # self.patient_id.setEnabled(False)
-        self.user_id = ""
         self.patient = ""
         self.process = QProcess(self)
 
-        
+        self.patient_id.setEnabled(False)
+        self.main_btn.setText("Machine Initialization\n Insert Test Chip")
+        self.loading = QPixmap('red bar.png')
+        self.loading_label.setPixmap(self.loading)
+        self.scan_label.clear()
+    
+        self.step1()
+
 
 #     for mannual working flow 
     def button_function(self):
@@ -179,18 +192,11 @@ class MainWindow(QMainWindow):
             
 
     def step1(self):  # pressure clamp,switch init; optics home
-        self.patient_id.setEnabled(False)
-        self.count = 2
-        self.main_btn.setText("Prepare and \n Insert Test Chip")
-        self.loading = QPixmap('red bar.png')
-        self.loading_label.setPixmap(self.loading)    
-        self.scan_label.clear()
-               
+              
 #        initiating the clamp code (pressure system connection)         
-
-#         initiating of the pressure system 
-     
-
+#        initiating of the pressure system 
+#        sequential: camera homing 
+ 
         self.start_btn.setStyleSheet("background-color: rgba(0, 255, 255, 0);background-image: url('Start button.png');")
         self.loading = QPixmap('green bar.png')
         self.loading_label.setPixmap(self.loading)  
@@ -203,7 +209,7 @@ class MainWindow(QMainWindow):
         self.start_btn.setStyleSheet("background-color: rgba(0, 255, 255, 0);border :0px")   
         self.formLayoutWidget.show()
         self.formLayoutWidget_2.show()
-        self.main_btn.setText("Preparation \n in Progress")
+        self.main_btn.setText("Autofocusing \n in Progress")
         self.loading_label.setGeometry(QtCore.QRect(300, 80, 430, 430))
         movie = QtGui.QMovie("loading.gif")
         self.loading_label.setMovie(movie)
@@ -211,44 +217,53 @@ class MainWindow(QMainWindow):
         self.label.setStyleSheet("font: 75 11pt \"MS Shell Dlg 2\";color: black;")
         self.label_6.setPixmap(self.grey)    
                 
-# check if chip inserted
-
-#         autofocusing of optics system 
-        while autofocus():
-            self.main_btn.setText("Auto focusing")
-        self.count = 4 
+# assumed chip inserted
+# autofocusing of optics system
+        try:
+            autofocusing()
+        except:
+            print("autofocusing failed")  
         self.step4() # automatic shift to next step
         
-        
-    def step4(self):  # priming: pressure(clamp and swtich control) 
         self.label.setStyleSheet("font: 75 11pt \"MS Shell Dlg 2\";color: grey;")
         self.label_2.setStyleSheet("font: 75 11pt \"MS Shell Dlg 2\";color: black;")
-        self.label_6.setPixmap(self.green)   
-        self.label_7.setPixmap(self.grey)  
+        self.label_6.setPixmap(self.green)
+        self.label_7.setPixmap(self.grey)
         self.main_btn.setText("Priming \n in Progress")
+        
+    def step4(self):  # priming: pressure(clamp and swtich control) 
+  #     primung process: call both Arduino to pressure valves control and sensor      
     
-    def step5(self):  # testing: switch/clamp open, pressurize, camera save video 
         self.label_2.setStyleSheet("font: 75 11pt \"MS Shell Dlg 2\";color: grey;")
         self.label_3.setStyleSheet("font: 75 11pt \"MS Shell Dlg 2\";color: black;")
-        self.label_7.setPixmap(self.green)   
-        self.label_8.setPixmap(self.grey)    
+        self.label_7.setPixmap(self.green)
+        self.label_8.setPixmap(self.grey)
         self.main_btn.setText("Test \n in Progress")
-        
-    def step6(self):  # data conversion: CV get the raw count
+
+    def step5(self):  # testing: switch/clamp open, pressurize, camera save video 
+ # another call of pressure system: both arduino loops     
+ # camera reading adn saving video, no arduino call required
+ # generate a hashed raw video id 
+        self.video_id = "jhdkujhh_video_idnbfjkdbvks" 
+
         self.label_3.setStyleSheet("font: 75 11pt \"MS Shell Dlg 2\";color: grey;")
         self.label_4.setStyleSheet("font: 75 11pt \"MS Shell Dlg 2\";color: black;")
-        self.label_8.setPixmap(self.green)   
-        self.label_9.setPixmap(self.grey)    
+        self.label_8.setPixmap(self.green)
+        self.label_9.setPixmap(self.grey)
         self.main_btn.setText("Data Conversion \n in Progress")
-    
 
-    def step7(self):  # data analysis: get features, classify, store the data
+    def step6(self):  # data conversion
+#  call CV for raw_count csv
+        self.WBC_count = 'wbc_count'
+        self.RBC_count = 'rbc_count'
         self.label_4.setStyleSheet("font: 75 11pt \"MS Shell Dlg 2\";color: grey;")
         self.label_5.setStyleSheet("font: 75 11pt \"MS Shell Dlg 2\";color: black;")
-        self.label_9.setPixmap(self.green)   
-        self.label_10.setPixmap(self.grey)    
+        self.label_9.setPixmap(self.green)
+        self.label_10.setPixmap(self.grey)
         self.main_btn.setText("Data Analysis \n in Progress")
-         
+      
+    
+    def step7(self):  # data analysis: get features, classify, store the data       
         # classify
          # get feature from raw csv
         generate_features()
@@ -258,7 +273,6 @@ class MainWindow(QMainWindow):
  
         self.label_4.setStyleSheet("font: 75 11pt \"MS Shell Dlg 2\";color: black;")
         self.label_10.setPixmap(self.green)
-
 
        # self.step8()
         
@@ -274,9 +288,9 @@ class MainWindow(QMainWindow):
             self.main_btn.setText("Result: Positive")
         else:
             self.main_btn.setText("Result: Negative")
-            
+        :
         # store the data
-        data_entries = (self.patient_id_str, self.patient_nric, self.staff_id_str, self.time, self.classification, self.WBC_count, self.RBC_count, self.raw_video_id)
+        data_entries = (self.patient_id_str, self.patient_nric, self.staff_id_str, self.time, self.result, self.WBC_count, self.RBC_count, self.video_id)
         store_data(data_entries)
 
 

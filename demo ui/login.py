@@ -1,9 +1,12 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-from demo import  *
+#from demo import  *
+from demo_gui_only import *
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import *
 import sqlite3
 import time
+from gpio_test import card_tap
+import traceback
 
 class WorkerSignals(QObject):
     finished = pyqtSignal()
@@ -37,6 +40,7 @@ class Ui_Form(QMainWindow):
         print('start new patient instance')
         self.ui = MainWindow(staff_id_value)
         self.ui.resize(1024, 600)
+        self.ui.showFullScreen()
         self.ui.show()
 #         self.close()
 
@@ -106,10 +110,11 @@ class Ui_Form(QMainWindow):
         val = cursor.fetchall()
         valid = False
         if len(val) >= 1:
-             for x in val:
-                if username in x[0]:
-                    valid = True
-                    break
+            valid = True
+           #  for x in val:
+           #     if username in x[0]:
+           #         valid = True
+           #         break
         if valid:
             print('Welcome')
 #             self.openwindow(username)
@@ -137,5 +142,6 @@ if __name__ == "__main__":
     app.setStyleSheet(stylesheet)       
     ui = Ui_Form()
     ui.resize(1024, 600)
+    ui.showFullScreen()
     ui.show()
     sys.exit(app.exec_())
