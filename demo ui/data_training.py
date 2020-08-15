@@ -69,8 +69,6 @@ def train(x_data: np.ndarray, y_data: np.ndarray, gamma_values, path):
         metrics.append([accuracy, val_spe, val_sens, roc_score])
 
         dump(sv_classifier_test, model_path) 
-
-
     return metrics
 
 cwd = os.getcwd()    

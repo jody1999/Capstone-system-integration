@@ -66,6 +66,7 @@ class Ui_Form(QMainWindow):
         self.thread = QThreadPool()
         # self.worker = Worker(self.rfid)
         
+        
     def button(self):
         # to be replace by the RFID code
         self.btn_next.setText("Tap Staff ID \n to Login")
